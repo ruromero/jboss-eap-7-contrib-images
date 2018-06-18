@@ -9,4 +9,4 @@ COPY db2-driver-image/modules /extensions/modules/
 
 # Download the driver into the module folder
 ADD https://artifacts.alfresco.com/nexus/content/repositories/public/com/ibm/db2/jcc/db2jcc4/10.1/db2jcc4-10.1.jar \
-    /extensions/modules/system/layers/openshift/com/ibm/main/
+    /extensions/modules/system/layers/openshift/com/ibm/main/db2jcc4.jar
