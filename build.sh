@@ -7,24 +7,20 @@ if [ -n "${DEBUG:-}" ] ; then
 fi
 
 function print_help() {
+    echo "----------------------------------------------------------"
     echo "Builds and pushes JDBC Driver images to a docker registry."
     echo ""
     echo "Usage: "
-    echo "   build.sh <DRIVER_NAME> [--registry=myregistry.example.com:5000] [--artifact-repo=https://myrepo.example.com/maven/public]"
+    echo "   ../build.sh [--registry=myregistry.example.com:5000] [--artifact-repo=https://myrepo.example.com/maven/public]"
     echo "Options:"
     echo "   Available driver images to build: db2,derby,mssql,oracle,mariadb,sybase"
     echo "   --registry         Specifies the docker registry to use for tagging and pushing. Defaults to docker-registry.default.svc:5000"
     echo "   --artifact-repo    Specifies the Maven repository where the jdbc drivers are available. Oracle does not have a default value"
 }
 
-declare -a drivers=()
-
 while (($#))
 do
     case $1 in
-        db2|derby|mssql|oracle|mariadb|sybase)
-            drivers+=($1)
-        ;;
         --registry=*)
             registry=${1#*=}
         ;;
@@ -43,11 +39,15 @@ do
 shift
 done
 
-if [[ ! ${#drivers[@]} -eq 1 ]]
+if [[ ! -f Dockerfile ]]
 then
+    echo "Error: No Dockerfile found"
     print_help
     exit 1
 fi
+
+current_dir=${PWD##*/}
+driver=$(echo $current_dir | cut -d '-' -f 1)
 
 registry=${registry:-docker-registry.default.svc:5000}
 
@@ -66,9 +66,9 @@ function build() {
     echo Building $driver
     if [[ -n $artifact_repo ]]
     then
-        docker build -f $driver/Dockerfile . -t $tag --build-arg ARTIFACT_MVN_REPO=$artifact_repo
+        docker build -f $current_dir/Dockerfile . -t $tag --build-arg ARTIFACT_MVN_REPO=$artifact_repo
     else
-        docker build -f $driver/Dockerfile . -t $tag
+        docker build -f $current_dir/Dockerfile . -t $tag
     fi
     echo Finished bulding $tag
 }
@@ -93,12 +93,13 @@ function create_build() {
 
 docker_login
 
-for driver in "${drivers[@]}"
-do
-    image_name=$driver-driver-image
-    version=$(grep version ${image_name}/Dockerfile | awk -F"=" '{print $2}' | sed 's/"//g')
-    tag=$registry/openshift/$image_name:$version
-    build $image_name $tag ${artifact_repo:-}
-    push $tag
-    create_build $driver $version
-done
+pushd ..
+
+image_name=$driver-driver-image
+version=$(grep version $current_dir/Dockerfile | awk -F"=" '{print $2}' | sed 's/"//g')
+tag=$registry/openshift/$image_name:$version
+build $image_name $tag ${artifact_repo:-}
+push $tag
+create_build $driver $version
+
+popd
