@@ -12,7 +12,7 @@ function print_help() {
     echo "Usage: "
     echo "   build.sh <DRIVER_1> [<DRIVER_2>...] [--registry=myregistry.example.com:5000] [--artifact-repo=https://myrepo.example.com/maven/public]"
     echo "Options:"
-    echo "   Available driver images to build: db2,derby,mssql,oracle,mariadb"
+    echo "   Available driver images to build: db2,derby,mssql,oracle,mariadb,sybase"
     echo "   --registry         Specifies the docker registry to use for tagging and pushing. Defaults to docker-registry.default.svc:5000"
     echo "   --artifact-repo    Specifies the Maven repository where the jdbc drivers are available. Oracle does not have a default value"
 }
@@ -22,7 +22,7 @@ declare -a drivers=()
 while (($#))
 do
     case $1 in
-        db2|derby|mssql|oracle|mariadb)
+        db2|derby|mssql|oracle|mariadb|sybase)
             drivers+=($1)
         ;;
         --registry=*)
