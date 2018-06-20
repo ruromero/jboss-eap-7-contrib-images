@@ -10,7 +10,7 @@ function print_help() {
     echo "Builds and pushes JDBC Driver images to a docker registry."
     echo ""
     echo "Usage: "
-    echo "   build.sh <DRIVER_1> [<DRIVER_2>...] [--registry=myregistry.example.com:5000] [--artifact-repo=https://myrepo.example.com/maven/public]"
+    echo "   build.sh <DRIVER_NAME> [--registry=myregistry.example.com:5000] [--artifact-repo=https://myrepo.example.com/maven/public]"
     echo "Options:"
     echo "   Available driver images to build: db2,derby,mssql,oracle,mariadb,sybase"
     echo "   --registry         Specifies the docker registry to use for tagging and pushing. Defaults to docker-registry.default.svc:5000"
@@ -43,7 +43,7 @@ do
 shift
 done
 
-if [[ ${#drivers[@]} -eq 0 ]]
+if [[ ! ${#drivers[@]} -eq 1 ]]
 then
     print_help
     exit 1
