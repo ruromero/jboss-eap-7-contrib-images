@@ -8,7 +8,7 @@ fi
 
 function print_help() {
     echo "----------------------------------------------------------"
-    echo "Builds and pushes JDBC Driver images to a docker registry."
+    echo "Builds and pushes JDBC Driver images to a docker registry. This has to be executed from a folder containing a Dockerfile"
     echo ""
     echo "Usage: "
     echo "   ../build.sh [--registry=myregistry.example.com:5000] [--artifact-repo=https://myrepo.example.com/maven/public]"
